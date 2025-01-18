@@ -1,0 +1,11 @@
+.changeset
+.github
+.vscode
+src
+tests
+pnpm-lock.yaml
+tsconfig.json
+vitest.config.mts
+CHANGELOG.md
+README.md
+CONTRIBUTING.md

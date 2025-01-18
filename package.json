@@ -1,0 +1,91 @@
+{
+  "name": "monarch-kit",
+  "version": "0.1.0",
+  "description": "Development kit for Monarch ORM",
+  "private": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "monarch": "./dist/index.js"
+  },
+  "scripts": {
+    "studio:build": "react-router build",
+    "studio:dev": "react-router dev",
+    "studio:start": "react-router-serve ./dist/studio/server/index.js",
+    "studio:typecheck": "react-router typegen && tsc",
+    "cli:build": "npm run check && shx rm -rf dist && tsup cli/index.ts --format esm,cjs --dts",
+    "cli:dev": "tsx cli/index.ts",
+    "build": "npm run cli:build && npm run studio:build",
+    "release": "npm run build && changeset publish",
+    "check": "npm run lint && npm run format && react-router typegen && tsc --noEmit",
+    "format": "biome format",
+    "format:fix": "biome format --write",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write",
+    "watch": "vitest",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "monarch",
+    "monarch-orm",
+    "mongodb",
+    "odm",
+    "orm",
+    "mongo"
+  ],
+  "author": "Eric Afes <eriicafes@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eriicafes/monarch-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eriicafes/monarch-kit/issues"
+  },
+  "homepage": "https://github.com/eriicafes/monarch-kit#readme",
+  "dependencies": {
+    "@react-router/node": "^7.1.3",
+    "@react-router/serve": "^7.1.3",
+    "@remix-run/express": "^2.15.2",
+    "@remix-run/node": "^2.15.2",
+    "commandstruct": "^0.3.0",
+    "compression": "^1.7.5",
+    "express": "^4.21.2",
+    "hollywood-di": "^0.5.2",
+    "isbot": "^5.1.21",
+    "monarch-orm": "^0.6.1",
+    "morgan": "^1.10.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router": "^7.1.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@changesets/cli": "^2.27.11",
+    "@react-router/dev": "^7.1.3",
+    "@types/compression": "^1.7.5",
+    "@types/express": "^5.0.0",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.1",
+    "shx": "^0.3.4",
+    "tailwindcss": "^3.4.17",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.2"
+  }
+}
