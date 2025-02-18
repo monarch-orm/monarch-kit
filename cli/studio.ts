@@ -12,21 +12,30 @@ import type { Database } from "~/core/database";
 export const studioCmd = createCommand("studio")
   .use<{ database: Database }>()
   .flags({
-    port: flag("web server port").char("p").optionalParam("number", 8080),
+    port: flag("web server port").char("p").optionalParam("number", 6548),
   })
-  .action(async ({ flags }, ctx) => {
-    const buildPath = path.resolve("dist/studio/server/index.js");
+  .action(async ({ flags }) => {
+    let buildPath = import.meta.dirname;
+    if (buildPath.endsWith("dist")) {
+      buildPath = path.join(buildPath, "ui/server/index.js");
+    } else {
+      // during development the ui dir different
+      buildPath = path.join(buildPath, "../dist/ui/server/index.js");
+    }
+
     const build: ServerBuild | null = await import(
       url.pathToFileURL(buildPath).href
     ).catch(() => null);
     if (!build) {
-      return console.error("[monarch-studio] err: missing build output");
+      return console.error(
+        `[monarch-studio] err: missing build output at ${buildPath}`
+      );
     }
 
     runServer(build, flags.port);
   });
 
-async function runServer(build: ServerBuild, port: number) {
+function runServer(build: ServerBuild, port: number) {
   installGlobals({ nativeFetch: build.future.v3_singleFetch });
 
   const app = express();
@@ -37,7 +46,7 @@ async function runServer(build: ServerBuild, port: number) {
     express.static(build.assetsBuildDirectory, {
       immutable: true,
       maxAge: "1y",
-    }),
+    })
   );
   app.use(express.static("public", { maxAge: "1h" }));
   app.use(morgan("tiny"));
@@ -55,7 +64,7 @@ async function runServer(build: ServerBuild, port: number) {
       console.log(`[monarch-studio] http://localhost:${port}`);
     } else {
       console.log(
-        `[monarch-studio] http://localhost:${port} (http://${address}:${port})`,
+        `[monarch-studio] http://localhost:${port} (http://${address}:${port})`
       );
     }
   }

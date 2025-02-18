@@ -10,6 +10,6 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer],
     },
   },
-  publicDir: "studio/public",
+  publicDir: "ui/public",
   plugins: [reactRouter(), tsconfigPaths()],
 });
