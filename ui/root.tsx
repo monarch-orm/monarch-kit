@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -5,10 +6,16 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteLoaderData,
 } from "react-router";
-
+import {
+  PreventFlashOnWrongTheme,
+  ThemeProvider,
+  useTheme,
+} from "remix-themes";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
+import { themeSessionResolver } from "./store.server";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,17 +31,50 @@ export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export const meta: Route.MetaFunction = () => [
+  { title: "Monarch Studio" },
+  {
+    name: "description",
+    content:
+      "Monarch Studio - Create, manage and view schemas, collections and relations",
+  },
+];
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const { getTheme } = await themeSessionResolver(request);
+  return {
+    theme: getTheme(),
+  };
+}
+
+export function Layout(props: { children: ReactNode }) {
+  const loaderData =
+    useRouteLoaderData<Route.ComponentProps["loaderData"]>("root");
+
   return (
-    <html lang="en">
+    <ThemeProvider
+      specifiedTheme={loaderData?.theme ?? null}
+      themeAction="/actions/theme"
+    >
+      <Shell ssrTheme={!!loaderData?.theme}>{props.children}</Shell>
+    </ThemeProvider>
+  );
+}
+
+function Shell(props: { ssrTheme: boolean; children: ReactNode }) {
+  const [theme] = useTheme();
+
+  return (
+    <html lang="en" className={theme ?? undefined} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
+        <PreventFlashOnWrongTheme ssrTheme={props.ssrTheme} />
         <Links />
       </head>
       <body>
-        {children}
+        {props.children}
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -42,7 +82,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App() {
+export default function App({}: Route.ComponentProps) {
   return <Outlet />;
 }
 
