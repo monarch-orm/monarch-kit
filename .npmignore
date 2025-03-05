@@ -1,8 +1,12 @@
 .changeset
 .github
 .vscode
-src
+.react-router
+cli
+core
+ui
 tests
+examples
 pnpm-lock.yaml
 tsconfig.json
 vitest.config.mts

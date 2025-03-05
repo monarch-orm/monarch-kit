@@ -1,10 +1,10 @@
-import { createCookieSessionStorage } from "react-router";
-import { createThemeSessionResolver } from "remix-themes";
-import type { Project } from "~/core/types";
+import { createCookieSessionStorage } from "react-router"
+import { createThemeSessionResolver } from "remix-themes"
+import type { Project } from "~/core/types"
 
 type Store = {
-  projects: Record<string, Project>;
-};
+  projects: Record<string, Project>
+}
 
 export const sessionStore = createCookieSessionStorage<Store>({
   cookie: {
@@ -15,6 +15,6 @@ export const sessionStore = createCookieSessionStorage<Store>({
     sameSite: "lax",
     secrets: ["notsecret"],
   },
-});
+})
 
-export const themeSessionResolver = createThemeSessionResolver(sessionStore);
+export const themeSessionResolver = createThemeSessionResolver(sessionStore)

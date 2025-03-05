@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from "react"
 import {
   isRouteErrorResponse,
   Links,
@@ -7,15 +7,11 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
-} from "react-router";
-import {
-  PreventFlashOnWrongTheme,
-  ThemeProvider,
-  useTheme,
-} from "remix-themes";
-import type { Route } from "./+types/root";
-import stylesheet from "./app.css?url";
-import { themeSessionResolver } from "./store.server";
+} from "react-router"
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
+import type { Route } from "./+types/root"
+import stylesheet from "./app.css?url"
+import { themeSessionResolver } from "./store.server"
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -29,7 +25,7 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
   { rel: "stylesheet", href: stylesheet },
-];
+]
 
 export const meta: Route.MetaFunction = () => [
   { title: "Monarch Studio" },
@@ -38,18 +34,18 @@ export const meta: Route.MetaFunction = () => [
     content:
       "Monarch Studio - Create, manage and view schemas, collections and relations",
   },
-];
+]
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { getTheme } = await themeSessionResolver(request);
+  const { getTheme } = await themeSessionResolver(request)
   return {
     theme: getTheme(),
-  };
+  }
 }
 
 export function Layout(props: { children: ReactNode }) {
   const loaderData =
-    useRouteLoaderData<Route.ComponentProps["loaderData"]>("root");
+    useRouteLoaderData<Route.ComponentProps["loaderData"]>("root")
 
   return (
     <ThemeProvider
@@ -58,11 +54,11 @@ export function Layout(props: { children: ReactNode }) {
     >
       <Shell ssrTheme={!!loaderData?.theme}>{props.children}</Shell>
     </ThemeProvider>
-  );
+  )
 }
 
 function Shell(props: { ssrTheme: boolean; children: ReactNode }) {
-  const [theme] = useTheme();
+  const [theme] = useTheme()
 
   return (
     <html lang="en" className={theme ?? undefined} suppressHydrationWarning>
@@ -73,44 +69,44 @@ function Shell(props: { ssrTheme: boolean; children: ReactNode }) {
         <PreventFlashOnWrongTheme ssrTheme={props.ssrTheme} />
         <Links />
       </head>
-      <body>
+      <body className="text-sm">
         {props.children}
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
-  );
+  )
 }
 
-export default function App({}: Route.ComponentProps) {
-  return <Outlet />;
+export default function App() {
+  return <Outlet />
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
+  let message = "Oops!"
+  let details = "An unexpected error occurred."
+  let stack: string | undefined
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
+    message = error.status === 404 ? "404" : "Error"
     details =
       error.status === 404
         ? "The requested page could not be found."
-        : error.statusText || details;
+        : error.statusText || details
   } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
+    details = error.message
+    stack = error.stack
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="container mx-auto p-4 pt-16">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
+        <pre className="w-full overflow-x-auto p-4">
           <code>{stack}</code>
         </pre>
       )}
     </main>
-  );
+  )
 }

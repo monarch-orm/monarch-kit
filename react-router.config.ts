@@ -1,4 +1,4 @@
-import type { Config } from "@react-router/dev/config";
+import type { Config } from "@react-router/dev/config"
 
 export default {
   // Config options...
@@ -6,4 +6,4 @@ export default {
   ssr: true,
   appDirectory: "ui",
   buildDirectory: "dist/ui",
-} satisfies Config;
+} satisfies Config
