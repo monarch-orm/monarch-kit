@@ -33,13 +33,18 @@ export class Entrypoint {
       }
       parent[leaf] = relpath
     }
+    suggestions.sort((a, b) => a.length - b.length)
+
     return { tree, suggestions }
   }
 
   public async getExports(relpath: string) {
     try {
       const exports = await this.import<any>(path.resolve(relpath))
-      return Object.keys(exports)
+      return Object.entries(exports).map(([name, value]) => ({
+        name,
+        isDb: value instanceof Database,
+      }))
     } catch (_error) {
       return []
     }

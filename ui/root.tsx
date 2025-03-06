@@ -69,7 +69,7 @@ function Shell(props: { ssrTheme: boolean; children: ReactNode }) {
         <PreventFlashOnWrongTheme ssrTheme={props.ssrTheme} />
         <Links />
       </head>
-      <body className="text-sm">
+      <body className="h-screen overflow-hidden text-sm">
         {props.children}
         <ScrollRestoration />
         <Scripts />
