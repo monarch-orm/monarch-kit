@@ -1,4 +1,4 @@
-import type { Project } from "~/core/types"
+import type { Project } from "~/core/models"
 
 export type DraftProject =
   | {
@@ -7,11 +7,11 @@ export type DraftProject =
     }
   | {
       step: 2
-      project: Pick<Project, "entrypoint" | "export">
+      project: Pick<Project, "file" | "export">
     }
   | {
       step: 3
-      project: Project
+      project: Pick<Project, "file" | "export" | "dbname" | "dbs">
     }
 
 export const initialDraftProject: DraftProject = { step: 1, project: null }
@@ -37,7 +37,7 @@ export function getPreviousDraftProject(): DraftProject {
       return {
         step: 2,
         project: {
-          entrypoint: draft.project.entrypoint,
+          file: draft.project.file,
           export: draft.project.export,
         },
       }

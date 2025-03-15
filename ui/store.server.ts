@@ -1,6 +1,6 @@
 import { createCookieSessionStorage } from "react-router"
 import { createThemeSessionResolver } from "remix-themes"
-import type { Project } from "~/core/types"
+import type { Project } from "~/core/models"
 
 type Store = {
   projects: Record<string, Project>

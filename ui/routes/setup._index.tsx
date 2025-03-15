@@ -25,20 +25,18 @@ import type { Route } from "./+types/setup._index"
 
 const completeSetup = createAction({
   schema: z.object({
+    file: z.string(),
+    export: z.string(),
     dbname: z.string(),
     dburl: z.string(),
-    entrypoint: z.string(),
-    export: z.string(),
   }),
   async handler(ctx, { request }) {
     const session = await sessionStore.getSession(request.headers.get("Cookie"))
-    const projects = session.get("projects")
     session.set("projects", {
-      ...projects,
       [process.cwd()]: {
-        entrypoint: ctx.input.entrypoint,
+        file: ctx.input.file,
         export: ctx.input.export,
-        dburl: ctx.input.dburl,
+        dbname: ctx.input.dbname,
         dbs: { [ctx.input.dbname]: ctx.input.dburl },
       },
     })
@@ -57,8 +55,7 @@ export async function action(args: Route.ActionArgs) {
 export async function loader({ request }: Route.LoaderArgs) {
   const cwd = process.cwd()
   const session = await sessionStore.getSession(request.headers.get("Cookie"))
-  const projects = session.get("projects")
-  const project = projects ? projects[cwd] : undefined
+  const project = await context.entrypoint.getProject(session.get("projects"))
   if (project) throw redirect("/")
 
   const files = await context.entrypoint.getFiles()
@@ -106,7 +103,7 @@ function ConnectSchema(props: { tree: DirTree; suggestions: string[] }) {
       setDraftProject({
         step: 2,
         project: {
-          entrypoint: value.file,
+          file: value.file,
           export: value.identifier,
         },
       })
@@ -119,7 +116,7 @@ function ConnectSchema(props: { tree: DirTree; suggestions: string[] }) {
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <p className="text-xs">
-        Select the file containing the monarch database export
+        Select file containing a monarch database export
       </p>
 
       <SchemaSelector
@@ -148,7 +145,7 @@ function ConnectDatabase() {
         step: 3,
         project: {
           ...draft.project,
-          dburl,
+          dbname,
           dbs: { [dbname]: dburl },
         },
       })
@@ -168,16 +165,20 @@ function ConnectDatabase() {
       <input type="hidden" name="_action" value="connectDatabase" />
       <div className="grid gap-1">
         <label className="text-xs font-medium">Database name</label>
-        <Input type="text" name="dbname" placeholder="Database name" />
+        <Input
+          type="text"
+          name="dbname"
+          placeholder="Enter database name"
+          defaultValue="Default"
+        />
       </div>
       <div className="grid gap-1">
-        <label className="text-xs font-medium">Connection string</label>
-        <Input type="url" name="dburl" placeholder="Database URL" />
+        <label className="text-xs font-medium">Database URL</label>
+        <Input type="url" name="dburl" placeholder="Enter database URL" />
       </div>
 
       <p className="text-xs text-muted-foreground">
-        You can add multiple database connections (dev and prod) and switch
-        between them.
+        You can add multiple database connections and switch between them.
       </p>
 
       <div className="mt-4 flex justify-between gap-4">
@@ -199,12 +200,11 @@ function CompleteSetup({
   const fetcher = useFetcher<typeof action>()
 
   const submitAction = async () => {
-    const dbname = Object.keys(draft.project.dbs)[0]!
     const data = {
-      dbname,
-      dburl: draft.project.dburl,
-      entrypoint: draft.project.entrypoint,
+      file: draft.project.file,
       export: draft.project.export,
+      dbname: draft.project.dbname,
+      dburl: draft.project.dbs[draft.project.dbname]!,
     } satisfies InferActionInput<typeof completeSetup>
     await fetcher.submit(
       {

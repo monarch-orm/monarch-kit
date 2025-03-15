@@ -4,10 +4,8 @@ import { sessionStore } from "../store.server"
 import type { Route } from "./+types/_index"
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const cwd = process.cwd()
   const session = await sessionStore.getSession(request.headers.get("Cookie"))
-  const projects = session.get("projects")
-  const project = projects ? projects[cwd] : undefined
+  const project = await context.entrypoint.getProject(session.get("projects"))
   if (!project) throw redirect("/setup")
 
   const dbs = await context.database.list()
