@@ -2,7 +2,7 @@ import { glob } from "glob"
 import { createJiti } from "jiti"
 import { Database } from "monarch-orm"
 import path from "node:path"
-import { localProjectSchema, projectSchema, type Project } from "./models"
+import { projectSchema, type Project } from "./models/project"
 
 export type DirTree = { [k: string]: string | DirTree }
 
@@ -12,11 +12,19 @@ export class Entrypoint {
   public async getProject(
     projects: Record<string, Project> | undefined,
   ): Promise<Project | undefined> {
-    const configPath = path.resolve("monarch.config.json")
-    const config = await this.import(configPath).catch(() => undefined)
-    if (config) return localProjectSchema.safeParse(config).data
-    const project = projects?.[process.cwd()]
-    if (project) return projectSchema.safeParse(project).data
+    const localProject = await this.import(path.resolve("monarch.config"), {
+      default: true,
+    }).catch(() => undefined)
+    const project = localProject ?? projects?.[process.cwd()]
+    const parsed = projectSchema.safeParse(project).data
+    // @ts-expect-error local is an internal option
+    if (parsed && localProject) parsed.local = true
+    return parsed
+  }
+
+  public isLocalProject(project: Project) {
+    // @ts-expect-error local is an internal option
+    return !!project.local
   }
 
   public async getDatabaseExport(relpath: string, identifier: string) {

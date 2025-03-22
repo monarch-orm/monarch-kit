@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import "dotenv/config"
+
 import { createProgram } from "commandstruct"
 import { Database } from "~/core/database"
 import { dbCmd } from "./db"
