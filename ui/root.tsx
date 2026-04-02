@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ReactNode } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -7,11 +7,14 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteLoaderData,
-} from "react-router"
-import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes"
-import type { Route } from "./+types/root"
-import stylesheet from "./app.css?url"
-import { themeSessionResolver } from "./store.server"
+} from "react-router";
+import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes";
+import { Entrypoint } from "~/core/entrypoint";
+import { box } from "~/ui/lib/utils.server";
+import type { Route } from "./+types/root";
+import stylesheet from "./app.css?url";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { themeSessionResolver } from "./session.server";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,40 +28,45 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
   { rel: "stylesheet", href: stylesheet },
-]
+  { rel: "icon", href: "/favicon.png" },
+];
 
 export const meta: Route.MetaFunction = () => [
   { title: "Monarch Studio" },
   {
     name: "description",
-    content:
-      "Monarch Studio - Create, manage and view schemas, collections and relations",
+    content: "Monarch Studio - Create, manage and view schemas, collections and relations",
   },
-]
+];
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { getTheme } = await themeSessionResolver(request)
+  const entrypoint = box.get(Entrypoint);
+  const configPath = request.headers.get("Config-Path");
+  if (import.meta.env.DEV) {
+    // fallback to example config only during development
+    entrypoint.configPath = "examples/monarch.config.ts";
+  } else if (configPath) {
+    entrypoint.configPath = configPath;
+  }
+
+  const { getTheme } = await themeSessionResolver(request);
   return {
     theme: getTheme(),
-  }
+  };
 }
 
 export function Layout(props: { children: ReactNode }) {
-  const loaderData =
-    useRouteLoaderData<Route.ComponentProps["loaderData"]>("root")
+  const loaderData = useRouteLoaderData<Route.ComponentProps["loaderData"]>("root");
 
   return (
-    <ThemeProvider
-      specifiedTheme={loaderData?.theme ?? null}
-      themeAction="/actions/theme"
-    >
+    <ThemeProvider specifiedTheme={loaderData?.theme ?? null} themeAction="/actions/theme">
       <Shell ssrTheme={!!loaderData?.theme}>{props.children}</Shell>
     </ThemeProvider>
-  )
+  );
 }
 
 function Shell(props: { ssrTheme: boolean; children: ReactNode }) {
-  const [theme] = useTheme()
+  const [theme] = useTheme();
 
   return (
     <html lang="en" className={theme ?? undefined} suppressHydrationWarning>
@@ -70,32 +78,29 @@ function Shell(props: { ssrTheme: boolean; children: ReactNode }) {
         <Links />
       </head>
       <body className="h-screen overflow-hidden text-sm">
-        {props.children}
+        <TooltipProvider>{props.children}</TooltipProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
 
 export default function App() {
-  return <Outlet />
+  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!"
-  let details = "An unexpected error occurred."
-  let stack: string | undefined
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+  let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error"
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details
+    message = error.status === 404 ? "404" : "Error";
+    details = error.status === 404 ? "The requested page could not be found." : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message
-    stack = error.stack
+    details = error.message;
+    stack = error.stack;
   }
 
   return (
@@ -108,5 +113,5 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         </pre>
       )}
     </main>
-  )
+  );
 }

@@ -1,14 +1,37 @@
 #!/usr/bin/env node
 
-import "dotenv/config"
+import "dotenv/config";
 
-import { createProgram } from "commandstruct"
-import { Database } from "~/core/database"
-import { dbCmd } from "./db"
-import { studioCmd } from "./studio"
+import { flag, program } from "commandstruct";
+import { collectionsCmd } from "./collections";
+import { countCmd } from "./count";
+import { deleteCmd } from "./delete";
+import { describeCmd } from "./describe";
+import { dropCmd } from "./drop";
+import { initCmd } from "./init";
+import { insertCmd } from "./insert";
+import { queryCmd } from "./query";
+import { studioCmd } from "./studio";
+import { updateCmd } from "./update";
 
-createProgram("monarch-cli")
-  .provide({ database: Database })
-  .commands(dbCmd, studioCmd)
+const programFlags = {
+  config: flag("monarch config path").optionalParam("string"),
+};
+export type ProgramFlags = typeof programFlags;
+
+program("monarch")
+  .flags(programFlags)
+  .commands(
+    collectionsCmd,
+    describeCmd,
+    queryCmd,
+    insertCmd,
+    countCmd,
+    updateCmd,
+    deleteCmd,
+    dropCmd,
+    initCmd,
+    studioCmd,
+  )
   .build()
-  .run()
+  .run({ errorOnUnknown: true });

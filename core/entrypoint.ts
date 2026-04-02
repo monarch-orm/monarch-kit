@@ -1,82 +1,48 @@
-import { glob } from "glob"
-import { createJiti } from "jiti"
-import { Database } from "monarch-orm"
-import path from "node:path"
-import { projectSchema, type Project } from "./models/project"
-
-export type DirTree = { [k: string]: string | DirTree }
+import { createJiti } from "jiti";
+import { createClient, createDatabase, Schemas } from "monarch-orm";
+import path from "node:path";
+import { prettifyError } from "zod";
+import { projectSchema } from "./project";
 
 export class Entrypoint {
-  private import = createJiti(import.meta.url).import
+  public configPath = "monarch.config";
 
-  public async getProject(
-    projects: Record<string, Project> | undefined,
-  ): Promise<Project | undefined> {
-    const localProject = await this.import(path.resolve("monarch.config"), {
+  private import = createJiti(import.meta.url).import;
+
+  public async getProject() {
+    const project = await this.import(path.resolve(this.configPath), {
       default: true,
-    }).catch(() => undefined)
-    const project = localProject ?? projects?.[process.cwd()]
-    const parsed = projectSchema.safeParse(project).data
-    // @ts-expect-error local is an internal option
-    if (parsed && localProject) parsed.local = true
-    return parsed
+    }).catch((error) => {
+      throw new Error(`Failed to read monarch config: ${error instanceof Error ? error.message : error}`);
+    });
+    const parsed = projectSchema.safeParse(project);
+    if (parsed.error) throw new Error("Failed to read monarch config\n" + prettifyError(parsed.error));
+    return parsed.data;
   }
 
-  public isLocalProject(project: Project) {
-    // @ts-expect-error local is an internal option
-    return !!project.local
-  }
-
-  public async getDatabaseExport(relpath: string, identifier: string) {
+  public async getSchemas(relpath: string) {
     try {
-      const exports = await this.import<any>(path.resolve(relpath))
-      const db = exports[identifier]
-      if (db instanceof Database) return db
-      return null
-    } catch (_error) {
-      return null
+      const base = path.dirname(this.configPath);
+      const exports = await this.import<any>(path.resolve(base, relpath));
+      const schemas = exports.schemas ?? exports.default;
+      if ("schemas" in schemas && "relations" in schemas && "withRelations" in schemas) {
+        return schemas as Schemas<any, any>;
+      }
+      throw new Error("Failed to read monarch schemas: no named or default schemas export found");
+    } catch (error) {
+      throw new Error(`Failed to read monarch schemas: ${error instanceof Error ? error.message : error}`);
     }
   }
 
-  public async getFileExports(relpath: string) {
-    try {
-      const exports = await this.import<any>(path.resolve(relpath))
-      return Object.entries(exports).map(([name, value]) => ({
-        name,
-        isDb: value instanceof Database,
-      }))
-    } catch (_error) {
-      return []
-    }
-  }
-
-  public async getFiles() {
-    const paths = await glob("**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs}", {
-      ignore: "{node_modules,tests,dist}/**",
-      withFileTypes: true,
-    })
-    const cwd = process.cwd()
-    const tree: DirTree = {}
-    const suggestions: string[] = []
-
-    for (const path of paths) {
-      const relpath = path.fullpath().slice((cwd + path.sep).length)
-      if (relpath.includes("db.") || relpath.includes("database.")) {
-        suggestions.push(relpath)
-      }
-      const segments = relpath.split(path.splitSep)
-      const leaf = segments.pop()!
-      let parent = tree
-      for (const segment of segments) {
-        if (!(segment in parent)) {
-          parent[segment] = {}
-        }
-        parent = parent[segment] as DirTree
-      }
-      parent[leaf] = relpath
-    }
-    suggestions.sort((a, b) => a.length - b.length)
-
-    return { tree, suggestions }
+  public async get() {
+    const project = await this.getProject();
+    const schemas = await this.getSchemas(project.schemas);
+    const client = createClient(project.connectionString, {
+      connectTimeoutMS: 5000,
+      socketTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 5000,
+    });
+    const db = createDatabase(client.db(), schemas);
+    return { project, schemas, db };
   }
 }

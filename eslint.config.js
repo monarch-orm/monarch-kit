@@ -1,14 +1,18 @@
-import eslint from "@eslint/js"
-import react from "eslint-plugin-react"
-import reactHooks from "eslint-plugin-react-hooks"
-import tseslint from "typescript-eslint"
+import eslint from "@eslint/js";
+import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
+import { defineConfig } from "eslint/config";
+import tseslint from "typescript-eslint";
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [".react-router", "dist"],
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
+  react.configs.flat.recommended,
+  react.configs.flat["jsx-runtime"],
+  reactHooks.configs.flat.recommended,
   {
     rules: {
       "@typescript-eslint/no-require-imports": 0,
@@ -24,20 +28,4 @@ export default tseslint.config(
       ],
     },
   },
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-    plugins: {
-      react: react,
-      "react-hooks": reactHooks,
-    },
-    rules: {
-      ...react.configs["jsx-runtime"].rules,
-      ...reactHooks.configs.recommended.rules,
-    },
-    languageOptions: {
-      globals: {
-        React: "writable",
-      },
-    },
-  },
-)
+);

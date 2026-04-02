@@ -6,10 +6,14 @@ cli
 core
 ui
 tests
+coverage
 examples
 pnpm-lock.yaml
 tsconfig.json
+.prettierignore
+prettier.config.mts
 vitest.config.mts
+tsdown.config.mts
 CHANGELOG.md
 README.md
 CONTRIBUTING.md
