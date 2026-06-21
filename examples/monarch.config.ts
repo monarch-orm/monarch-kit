@@ -1,4 +1,4 @@
-import { defineConfig } from "monarch-kit";
+import { defineConfig } from "../lib";
 
 export default defineConfig({
   schemas: "schemas",
