@@ -1,12 +1,12 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { DocumentCell } from "~/ui/components/document-cell";
+import { JsonViewer } from "~/ui/components/json-viewer";
 import { Checkbox } from "~/ui/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/ui/components/ui/dialog";
 import { describeSchemaBadge } from "~/ui/lib/collection-schema";
 import { ROW_HEIGHT, type SchemaNode, type SerializedDocument } from "~/ui/lib/collection-types";
 import { getDocumentKey, isTaggedObjectId } from "~/ui/lib/collection-utils";
-import { DocumentCell } from "~/ui/components/document-cell";
-import { JsonViewer } from "~/ui/components/json-viewer";
 
 type CollectionTableProps = {
   columns: string[];
@@ -25,7 +25,6 @@ function getDocumentTitle(doc: SerializedDocument): string {
 
 export function CollectionTable(props: CollectionTableProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count: props.documents.length,
     getScrollElement: () => scrollRef.current,

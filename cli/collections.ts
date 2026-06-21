@@ -1,6 +1,6 @@
 import { command, flag } from "commandstruct";
-import { getCollection, loadDb } from "./utils/db";
 import type { ProgramFlags } from ".";
+import { getCollection, loadDb } from "./utils/db";
 
 export const collectionsCmd = command("collections")
   .describe("List configured collections")

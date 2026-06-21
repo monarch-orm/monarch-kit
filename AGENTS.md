@@ -23,18 +23,18 @@ The lib entry (`lib/index.ts`) only exports `defineConfig` so users can write ty
 
 ## Source layout
 
-| Path | Purpose |
-|---|---|
-| `cli/` | CLI commands (one file per command) + `utils/` helpers |
-| `core/` | `Entrypoint` (loads config + connects DB) and `Project` schema |
-| `lib/` | Public library entry — just `defineConfig` |
-| `ui/` | Studio web app (`appDirectory` for React Router) |
-| `ui/routes/` | File-system routes via `@react-router/fs-routes` flat-routes convention |
-| `ui/components/` | Reusable components used across routes |
-| `ui/components/ui/` | shadcn/ui primitives (base-ui backed) |
-| `ui/lib/` | Client-safe utilities and server utilities |
-| `ui/lib/collection-*.ts` | Collection-specific types, schema helpers, client utils |
-| `ui/lib/utils.server.ts` | Server-only: `box` singleton + DB serialization/cursor helpers |
+| Path                     | Purpose                                                                 |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `cli/`                   | CLI commands (one file per command) + `utils/` helpers                  |
+| `core/`                  | `Entrypoint` (loads config + connects DB) and `Project` schema          |
+| `lib/`                   | Public library entry — just `defineConfig`                              |
+| `ui/`                    | Studio web app (`appDirectory` for React Router)                        |
+| `ui/routes/`             | File-system routes via `@react-router/fs-routes` flat-routes convention |
+| `ui/components/`         | Reusable components used across routes                                  |
+| `ui/components/ui/`      | shadcn/ui primitives (base-ui backed)                                   |
+| `ui/lib/`                | Client-safe utilities and server utilities                              |
+| `ui/lib/collection-*.ts` | Collection-specific types, schema helpers, client utils                 |
+| `ui/lib/utils.server.ts` | Server-only: `box` singleton + DB serialization/cursor helpers          |
 
 ## Path aliases (tsconfig)
 

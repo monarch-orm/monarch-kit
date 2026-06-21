@@ -1,9 +1,9 @@
 import { log } from "@clack/prompts";
 import { arg, command, flag } from "commandstruct";
+import type { ProgramFlags } from ".";
 import { getCollection, loadDb } from "./utils/db";
 import { printJsonOutput } from "./utils/helpers";
 import { Prompts } from "./utils/prompts";
-import type { ProgramFlags } from ".";
 
 export const queryCmd = command("query")
   .describe("Query a collection with schema-aware prompts")

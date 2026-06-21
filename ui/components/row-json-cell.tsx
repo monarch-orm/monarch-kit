@@ -31,7 +31,7 @@ export function RowJsonCell(props: RowJsonCellProps) {
       <div className="flex h-full items-center justify-center px-1.5">
         <button
           type="button"
-          className="text-foreground/30 hover:text-foreground/70 hover:bg-white/8 inline-flex size-7 items-center justify-center rounded opacity-0 transition-all duration-100 group-hover:opacity-100"
+          className="text-foreground/30 hover:text-foreground/70 inline-flex size-7 items-center justify-center rounded opacity-0 transition-all duration-100 group-hover:opacity-100 hover:bg-white/8"
           onClick={() => setOpen(true)}
           aria-label="Open document JSON"
         >

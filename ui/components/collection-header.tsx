@@ -1,4 +1,12 @@
-import { ChevronLeftIcon, ChevronRightIcon, FilterIcon, MoonIcon, PanelLeftCloseIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  FilterIcon,
+  MoonIcon,
+  PanelLeftCloseIcon,
+  PlusIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { Link } from "react-router";
 import { Theme, useTheme } from "remix-themes";
 import { Button } from "~/ui/components/ui/button";

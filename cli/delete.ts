@@ -1,8 +1,8 @@
 import { log } from "@clack/prompts";
 import { arg, command, flag } from "commandstruct";
+import type { ProgramFlags } from ".";
 import { getCollection, loadDb } from "./utils/db";
 import { Prompts } from "./utils/prompts";
-import type { ProgramFlags } from ".";
 
 export const deleteCmd = command("delete")
   .describe("Delete documents using schema-aware filters")

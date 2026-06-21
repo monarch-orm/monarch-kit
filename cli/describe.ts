@@ -1,10 +1,10 @@
 import { log } from "@clack/prompts";
 import { arg, command } from "commandstruct";
+import type { ProgramFlags } from ".";
 import { getCollection, loadDb } from "./utils/db";
 import { printJsonOutput } from "./utils/helpers";
 import { Prompts } from "./utils/prompts";
 import { describeFieldType, getCollectionFieldDefinitions } from "./utils/schema";
-import type { ProgramFlags } from ".";
 
 export const describeCmd = command("describe")
   .describe("Show collection metadata, indexes and schema fields")

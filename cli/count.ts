@@ -1,7 +1,7 @@
 import { arg, command } from "commandstruct";
+import type { ProgramFlags } from ".";
 import { getCollection, loadDb } from "./utils/db";
 import { Prompts } from "./utils/prompts";
-import type { ProgramFlags } from ".";
 
 export const countCmd = command("count")
   .describe("Count documents in a collection using schema-aware filters")
