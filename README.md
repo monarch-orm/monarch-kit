@@ -8,7 +8,7 @@
 npm install -D monarch-kit
 ```
 
-## Configuration
+## Usage
 
 Create a `monarch.config.ts` (or `.js`) at the root of your project:
 
@@ -103,12 +103,21 @@ Opens on `http://localhost:6543` by default. Features:
 - Dark / light theme toggle
 - Sidebar search to filter collections
 
-## Using in development
+## Development
 
 ```sh
-# Install
-npm install -D monarch-kit
+# Start the Studio dev server (port 6543)
+pnpm ui:dev
 
-# Run CLI without installing globally
-npx monarch studio
+# Run CLI commands without a build step
+pnpm cli:dev -- <command> [flags]
+
+# Build CLI + Studio
+pnpm build
+
+# Type-check, lint, format, and regenerate route types
+pnpm check
+
+# Run tests
+pnpm test
 ```
